@@ -19,7 +19,7 @@ def main() -> None:
         order by year"
     )
     result_2020 = mycursor.fetchall()
-    print(result_2020)
+    #print(result_2020)
     #turn data to x,y
     year = []
     avg = []
@@ -35,10 +35,12 @@ def main() -> None:
     slope_avg, intercept_avg, r_avg, p_avg, std_err_avg = stats.linregress(year, avg) #pass list
     gsr_model_avg = list(map(lambda x: slope_avg * x + intercept_avg, year))
     print(f"r_avg = {r_avg*100:.2f}%")
+    print(f"p_avg = {p_avg*100:.2f}%") #p-value is under 0.05 / 5% indicate that the linear regression is true
 
     slope_max, intercept_max, r_max, p_max, std_err_max = stats.linregress(year, max) #pass list
     gsr_model_max = list(map(lambda x: slope_max * x + intercept_max, year))
     print(f"r_max = {r_max*100:.2f}%")
+    print(f"p_max = {p_max*100:.2f}%")
 
     year = np.array(year)
     avg = np.array(avg)

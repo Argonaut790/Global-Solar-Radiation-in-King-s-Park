@@ -16,6 +16,7 @@ def main()->None:
     mycursor.execute(
         "select month, avg(value) as avg, max(value) as max, min(value) as min, row_number() over(partition by year order by year, month) as id\
         from gsr.daily_kp_gsr_all\
+        where year>=1993 and year<=2021\
         group by month, year\
         order by year"
     )
@@ -33,23 +34,24 @@ def main()->None:
     print(tol_month)
     print(result_2020)
     for data in result_2020:
-        if data[4] == 1:
-            month = np.array(month)
-            avg = np.array(avg)
-            max = np.array(max)
-            min = np.array(min)
-            plot.scatter(month, avg)
-            index += 1
-            month = [] #0
-            avg = [] #1
-            max = [] #2
-            min = [] #3
-
         month.append(data[0])
         avg.append(data[1])
         tol_avg.append(data[1])
         max.append(data[2])
         min.append(data[3])
+
+        if data[0] == 12: #if month returns to jan then set to a year and plot it
+            print(data)
+            month = np.array(month)
+            avg = np.array(avg)
+            max = np.array(max)
+            min = np.array(min)
+            plot.plot(month, avg) # same year same colour
+            index += 1
+            month = [] #0
+            avg = [] #1
+            max = [] #2
+            min = [] #3
     """
     slope_avg, intercept_avg, r_avg, p_avg, std_err_avg = stats.linregress(tol_month, tol_avg) #pass list
     gsr_model_avg = list(map(lambda x: slope_avg * x + intercept_avg, tol_month))
