@@ -1,9 +1,11 @@
 import mysql.connector
 import matplotlib.pyplot as plot
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PolynomialFeatures
 
 def main() -> None:
     #retrieve data from mysql
@@ -33,19 +35,22 @@ def main() -> None:
     
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
 
-    #scaler the data
     scaler = StandardScaler()
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.fit_transform(x_test)
     #print(x_train_scaled)
 
+    poly_features = PolynomialFeatures(degree=2, include_bias=False)
+    x_train_scaled_poly = poly_features.fit_transform(x_train_scaled)
+    x_test_scaled_poly = poly_features.fit_transform(x_test_scaled)
+
     lr = LinearRegression()
-    lr.fit(x_train_scaled, y_train)
+    lr.fit(x_train_scaled_poly, y_train)
     c = lr.intercept_
     m = lr.coef_
     #print(m)
 
-    y_pred_train = lr.predict(x_train_scaled) #lr model is done now reuse the x training data to predict it y value which is using 70% of the data
+    y_pred_train = lr.predict(x_train_scaled_poly) #lr model is done now reuse the x training data to predict it y value which is using 70% of the data
     #print(y_pred_train)
 
     plot.subplot(1,2,1)
@@ -57,7 +62,7 @@ def main() -> None:
     plot.ylabel("Predicted Average Temperature")
 
     #using test data
-    y_pred_test = lr.predict(x_test_scaled)
+    y_pred_test = lr.predict(x_test_scaled_poly)
     plot.subplot(1,2,2)
     plot.scatter(y_test, y_pred_test, s=1)
     plot.title("Average Temperature - King's Park (Test Data)", y=1.04)
