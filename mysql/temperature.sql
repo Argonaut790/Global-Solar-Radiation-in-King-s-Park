@@ -119,3 +119,6 @@ ORDER BY Sun.Year, Sun.Month, Sun.Day;
 
 SELECT sun, rh, gsr, avgTemp FROM temperature.join_result
 ORDER BY Year, Month, Day;
+
+SELECT sun, avgTemp FROM temperature.join_result
+ORDER BY Year, Month, Day;
