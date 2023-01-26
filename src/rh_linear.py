@@ -14,11 +14,44 @@ def main() -> None:
     mycursor = mydb.cursor()
     
     mycursor.execute(
+        "SELECT Year, Month, AVG(Value) AS AvgTemp FROM temperature.clmtemp_kp\
+        WHERE dataCompleteness = 'C'\
+        GROUP BY Year, Month\
+        ORDER BY Year, Month;"
+    )
+
+    result = mycursor.fetchall()
+
+    year = []
+    month = []
+    avgTemp = []
+
+    temp = result[0][0] #get the first year, temp is use for indexing the plot among every year
+    for data in result:
+        if data[0] != temp:
+            plot.scatter(month, avgTemp)
+            temp = data[0]
+            year = []
+            month = []
+            avgTemp = []
+        
+        year.append(data[0])
+        month.append(data[1])
+        avgTemp.append(data[2])
+
+    plot.title("Average Temperature - King's Park")
+    plot.xlabel("Month")
+    plot.ylabel("Average Temperature (°C)") 
+    plot.show()
+
+    '''
+    mycursor.execute(
         "SELECT value, row_number() OVER(ORDER BY Year, Month, Day) as id FROM temperature.clmtemp_kp\
     WHERE dataCompleteness = 'C';"
     )
     
     result = mycursor.fetchall()
+    
     value = []
     id = []
 
@@ -33,7 +66,8 @@ def main() -> None:
     plot.ylabel("Average Temperature (°C)") 
 
     plot.show() 
-        
+    '''
+
     '''
     mycursor.execute(
         "select year, avg(value) as avg, max(value) as max, min(value) as min\

@@ -11,6 +11,12 @@ WHERE dataCompleteness = 'C'
 GROUP BY year 
 ORDER BY year;
 
+select month, year, avg(value) as avg, max(value) as max, min(value) as min, row_number() over(partition by year order by year, month) as id
+from gsr.daily_kp_gsr_all
+where year>1992 and year<2000
+group by month, year
+order by year;
+
 /* create test database */
 CREATE DATABASE test;
 
