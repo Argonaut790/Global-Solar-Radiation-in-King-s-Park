@@ -16,11 +16,13 @@ def main() -> None:
     )
     mycursor = mydb.cursor()
     
+    #run query, get the x xariable data
     mycursor.execute(
         "SELECT sun FROM temperature.join_result\
         ORDER BY Year, Month, Day;"
     )
 
+    #fetch data, get the dependent variable data
     x = mycursor.fetchall()
     #print(x)
 
@@ -32,6 +34,7 @@ def main() -> None:
     y = mycursor.fetchall()
     #print(y)
     
+    #split data into train set (70%) and test set (30%)
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
 
     #building a polynomial regression model
@@ -39,18 +42,22 @@ def main() -> None:
     x_train_poly = poly.fit_transform(x_train)
     x_test_poly = poly.fit_transform(x_test)
 
+    #fit data to the pr(polynomial regression) model
     pr_sun = LinearRegression()
     pr_sun.fit(x_train_poly, y_train)
     sun_train_ls = np.linspace(0,12,100).reshape(-1,1)
     sun_train_ls_poly = poly.transform(sun_train_ls)
 
+    #linear regression model
     lr_sun = LinearRegression()
     lr_sun.fit(x_train, y_train)
     c_sun = lr_sun.intercept_
     m_sun = lr_sun.coef_
     #print(m_sun)
 
+    #use the model to predict y value
     y_pred_train = lr_sun.predict(x_train) #lr model is done now reuse the x training data to predict it y value which is using 70% of the data
+    y_pred_test = lr_sun.predict(x_test)
     y_pred_train_poly = pr_sun.predict(sun_train_ls_poly)
     #print(y_pred_train)
 
@@ -62,13 +69,11 @@ def main() -> None:
     plot.plot(sun_train_ls, y_pred_train_poly, label="Polynomial Regression", color='black')
     plot.legend()
     plot.title("Bright Sun Time - Average Temperature Relationship", y=1.04)
-    plot.title(f"r^2={r2_score(y_train, y_pred_train):.2f}(linear)", loc='right', size=7)
-    print("Sun - AvgTemp")
-    print(f"r^2 = {r2_score(y_train, y_pred_train):.2f}")
-    print(f"score = {lr_sun.score(x_train, y_train)}")
+    plot.title(f"Linear: r^2={r2_score(y_train, y_pred_train):.2f}(Train), Test r^2={r2_score(y_test, y_pred_test):.2f}(Test)", loc='right', size=7)
     plot.xlabel("Bright Sun Time")
     plot.ylabel("Average Temperature")
     
+    #do the same for the rh(relative humidity)
     mycursor.execute(
         "SELECT rh FROM temperature.join_result\
         ORDER BY Year, Month, Day;"
@@ -95,6 +100,7 @@ def main() -> None:
     #print(m_rh)
 
     y_pred_train = lr_rh.predict(x_train) #lr model is done now reuse the x training data to predict it y value which is using 70% of the data
+    y_pred_test = lr_rh.predict(x_test)
     y_pred_train_poly = pr_rh.predict(rh_train_ls_poly)
     #print(y_pred_train)
 
@@ -106,13 +112,11 @@ def main() -> None:
     plot.plot(rh_train_ls, y_pred_train_poly, label="Polynomial Regression", color='black')
     plot.legend()
     plot.title("Relative Humidity - Average Temperature Relationship", y=1.04)
-    plot.title(f"r^2 = {r2_score(y_train, y_pred_train):.2f}", loc='right', size=7)
-    print("RH - AvgTemp")
-    print(f"r^2 = {r2_score(y_train, y_pred_train):.2f}")
-    print(f"score = {lr_rh.score(x_train, y_train)}")
+    plot.title(f"Linear: r^2={r2_score(y_train, y_pred_train):.2f}(Train), Test r^2={r2_score(y_test, y_pred_test):.2f}(Test)", loc='right', size=7)
     plot.xlabel("Relative Humidity")
     plot.ylabel("Average Temperature")
     
+    #gsr part
     mycursor.execute(
         "SELECT gsr FROM temperature.join_result\
         ORDER BY Year, Month, Day;"
@@ -139,6 +143,7 @@ def main() -> None:
     #print(m_gsr)
 
     y_pred_train = lr_gsr.predict(x_train) #lr model is done now reuse the x training data to predict it y value which is using 70% of the data
+    y_pred_test = lr_gsr.predict(x_test)
     y_pred_train_poly = pr_gsr.predict(gsr_train_ls_poly)
     #print(y_pred_train)
 
@@ -150,13 +155,11 @@ def main() -> None:
     plot.plot(gsr_train_ls, y_pred_train_poly, label="Polynomial Regression", color='black')
     plot.legend()
     plot.title("Global Solar Radiation - Average Temperature Relationship", y=1.04)
-    plot.title(f"r^2 = {r2_score(y_train, y_pred_train):.2f}", loc='right', size=7)
-    print("RH - AvgTemp")
-    print(f"r^2 = {r2_score(y_train, y_pred_train):.2f}")
-    print(f"score = {lr_gsr.score(x_train, y_train)}")
+    plot.title(f"Linear: r^2={r2_score(y_train, y_pred_train):.2f}(Train), Test r^2={r2_score(y_test, y_pred_test):.2f}(Test)", loc='right', size=7)
     plot.xlabel("Global Solar Radiation")
     plot.ylabel("Average Temperature")
 
+    #show the plot
     plot.show()
 
 if __name__ == "__main__":
