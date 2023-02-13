@@ -37,6 +37,7 @@ def main() -> None:
     #split data into train set (70%) and test set (30%)
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
 
+    #--------------------------------------------------
     #building a polynomial regression model
     poly = PolynomialFeatures(degree=7)
     x_train_poly = poly.fit_transform(x_train)
@@ -45,16 +46,16 @@ def main() -> None:
     #fit data to the pr(polynomial regression) model
     pr_sun = LinearRegression()
     pr_sun.fit(x_train_poly, y_train)
-    sun_train_ls = np.linspace(0,12,100).reshape(-1,1)
-    sun_train_ls_poly = poly.transform(sun_train_ls)
-
+    sun_train_ls = np.linspace(start=np.min(x_train), stop=np.max(x_train), num=100)
+    sun_train_ls_poly = poly.fit_transform(sun_train_ls.reshape(-1,1))
+    #--------------------------------------------------
     #linear regression model
     lr_sun = LinearRegression()
     lr_sun.fit(x_train, y_train)
     c_sun = lr_sun.intercept_
     m_sun = lr_sun.coef_
     #print(m_sun)
-
+    #--------------------------------------------------
     #use the model to predict y value
     y_pred_train = lr_sun.predict(x_train) #lr model is done now reuse the x training data to predict it y value which is using 70% of the data
     y_pred_test = lr_sun.predict(x_test)
@@ -69,7 +70,8 @@ def main() -> None:
     plot.plot(sun_train_ls, y_pred_train_poly, label="Polynomial Regression", color='black')
     plot.legend()
     plot.title("Bright Sun Time - Average Temperature Relationship", y=1.04)
-    plot.title(f"Linear: r^2={r2_score(y_train, y_pred_train):.2f}(Train), Test r^2={r2_score(y_test, y_pred_test):.2f}(Test)", loc='right', size=7)
+    plot.title(f"Linear: r^2={r2_score(y_train, y_pred_train):.2f}(Train), Test r^2={r2_score(y_test, y_pred_test):.2f}(Test)", loc='left', size=7)
+    plot.title(f"Poly: r^2={r2_score(y_train, pr_sun.predict(x_train_poly)):.2f}(Train)", loc='right', size=7)
     plot.xlabel("Bright Sun Time")
     plot.ylabel("Average Temperature")
     
